@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Sunrise</title>
+
+	<link rel="stylesheet"  href="/static/jquery.mobile-1.4.2.min.css">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+
+	<script src="/static/jquery.js"></script>
+	<script src="/static/jquery.mobile-1.4.2.min.js"></script>
+    <script>
+    $(function(){
+        $("input[type='number']").slider({
+            "stop": function(){
+                    $.get("/change/"+$(this).attr('name')+"/"+$(this).val(), 
+                            function(d){
+                                console.log(d);
+                            });
+            }
+        });
+    });
+    </script>
+</head>
+<body>
+    
+    <div data-role="page">
+
+        <div data-role="header">Sunrise</div>
+
+        <div class="ui-content">
+            <label for="red">Red:</label>
+            <input type='number' name="red" id="red" min="0" max="255" value="128">
+            <label for="green">Green:</label>
+            <input type='number' name="green" id="green" min="0" max="255" value="128">
+            <label for="blue">Blue:</label>
+            <input type='number' name="blue" id="blue" min="0" max="255" value="128">
+        </div>
+
+        <div data-role="footer">foot</div>
+
+    </div>
+
+</body>
+</html>
