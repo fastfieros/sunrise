@@ -1,40 +1,57 @@
 #!/usr/bin/env python
 
-import time
-import RPi.GPIO as GPIO
+import time, os
+#import RPi.GPIO as GPIO
+import serial
 
-RGB = (11,13,15)
+class RGBstrip():
 
-GPIO.setmode(GPIO.BOARD)
 
-GPIO.setup(RGB[0], GPIO.OUT)
-GPIO.setup(RGB[1], GPIO.OUT)
-GPIO.setup(RGB[2], GPIO.OUT)
+    def __init__(self):
+        self.ser = serial.Serial("/dev/ttyAMA0")
+        self.r = 0;
+        self.g = 0
+        self.b = 0;
 
-Rp = GPIO.PWM(RGB[0], 120)  # channel=25 frequency=50Hz
-Gp = GPIO.PWM(RGB[1], 120)  # channel=25 frequency=50Hz
-Bp = GPIO.PWM(RGB[2], 120)  # channel=25 frequency=50Hz
+    def update(self, name, value):
 
-Rp.start(0)
-Gp.start(0)
-Bp.start(0)
-try:
-    while 1:
-        for dc in range(0, 101, 5):
-            Rp.ChangeDutyCycle(dc)
-            Gp.ChangeDutyCycle(dc)
-            Bp.ChangeDutyCycle(dc)
-            time.sleep(0.025)
-        for dc in range(100, -1, -5):
-            Rp.ChangeDutyCycle(dc)
-            Gp.ChangeDutyCycle(dc)
-            Bp.ChangeDutyCycle(dc)
-            time.sleep(0.025)
-except KeyboardInterrupt:
+        value = int(value)
+        if value > 255 or value < 0:
+            print "Bad value: ", value
+            return
+
+        if "red" in name:
+            self.r = value
+
+        elif "green" in name:
+            self.g = value
+
+        elif "blue" in name:
+            self.b = value
+
+        else:
+            print "Unknown name: ",name
+            return
+
+        print "Set ",name," to ",value, ": ",self.r,self.g,self.b
+        self.setRgb()
+
+    def setRgb(self):
+        for c in (self.r,self.g,self.b):
+            if c >255 or c<0:
+                print "Invalid value: ",c
+                return;
+
+        self.ser.write("%d,%d,%d\n"%(self.g,self.r,self.b))
+        print("%d,%d,%d\n"%(self.g,self.r,self.b))
+
+    def cleanup(self):
+
+        self.ser.close()
+
+    def __del__(self):
+        self.cleanup()
+
+
+if __name__ == "__main__":
     pass
-
-Rp.stop()
-Gp.stop()
-Bp.stop()
-
-GPIO.cleanup()
