@@ -62,7 +62,6 @@ class RGBstrip():
         self.g = 0
         self.b = 0
         self.setRgb()
-        print "ALARM!"
 
     def cleanup(self):
 
@@ -73,26 +72,26 @@ class RGBstrip():
 
 class timer(threading.Thread):
 
-    def __init__(self, timeout=None, callback=None):
+    def __init__(self, timeout=None, callback=None, res=1):
         self.timeout = timeout or datetime.now()
         self.done = False
         self.callback = callback
+        self.resolution = res
         threading.Thread.__init__(self)
 
     def run(self):
         print "running"
         while not self.done:
             now = datetime.now()
-            print self.secondsLeft(), "s left, sleeping 1"
+            #print self.secondsLeft(), "s left, sleeping 1"
 
             if now > self.timeout:
                 self.done = True
 
-                print "about to call: ", self.callback
                 if self.callback:
                     self.callback()
             else:
-                time.sleep(1)
+                time.sleep(self.resolution)
 
     def secondsLeft(self):
         return (self.timeout - datetime.now()).total_seconds()

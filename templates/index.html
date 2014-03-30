@@ -43,17 +43,19 @@
                 $.get("/alarm/"+$("input.alarm").val(),
                         function(d){
                             console.log(d);
+                            $("#alarm-content").load('/alarm');
                         });
 
                 event.preventDefault();
         });
-        $("#disable").submit(function(event){
-        });
-        $("#off-button").click(function(){
-                $.get("/setRGB/0/0/0",
+        $("#disable").click(function(event){
+                $.get("/alarm/disable",
                         function(d){
                             console.log(d);
+                            $("#alarm-content").load('/alarm');
                         });
+                event.preventDefault();
+
         });
         $(".swatch").click(function(){
                 var r = $(this).attr("data-r");
@@ -100,6 +102,7 @@
         .swatch-white  {background-color: #FFF;}
         .swatch-orange {background-color: #F80;}
         .swatch-pink   {background-color: #F88;}
+        .swatch-black  {background-color: #282828;}
         .clear         {clear: both;}
 
         .swatch.spacer {
@@ -156,41 +159,34 @@
                 <div                                     class='swatch spacer'></div>
 
                 <div                                     class='swatch spacer'></div>
-                <div data-r="FF" data-g="01" data-b="00" class='swatch swatch-orange'></div>
+                <div data-r="FF" data-g="88" data-b="00" class='swatch swatch-orange'></div>
                 <div data-r="FF" data-g="FF" data-b="FF" class='swatch swatch-white'></div>
                 <div data-r="00" data-g="FF" data-b="FF" class='swatch swatch-cyan'></div>
                 <div                                     class='swatch spacer'></div>
 
                 <div                                     class='swatch spacer'></div>
-                <div data-r="FF" data-g="01" data-b="01" class='swatch swatch-pink'></div>
+                <div data-r="00" data-g="00" data-b="00" class='swatch swatch-black'></div>
                 <div data-r="FF" data-g="FF" data-b="00" class='swatch swatch-yellow'></div>
                 <div data-r="00" data-g="FF" data-b="00" class='swatch swatch-green'></div>
                 <div                                     class='swatch spacer'></div>
 
                 <div class='clear'></div>
             </div>
-            <div class="three columns alpha">
+            <!--<div class="three columns alpha">
                 <button id="on-button">On</button>
             </div>
             <div class="three columns omega">
                 <button id="off-button">Off</button>
-            </div>
+            </div>-->
 		</div>
 
         <div class="six columns clearfix">
 
-            <h3>alarm</h3>
-            <hr>
-            <!--<img src="static/sunrise.png" class='clock'>-->
-            <img src="static/clock.png" class='clock disabled' id='clock' >
-            <br>
-            <p>Is currently <strong id='alarmStatus'>
-            {% if not at %}
-            disabled </strong>.</p>
-            {% else %}
-            set </strong> for {{ at.strftime("%I:%M%p on %A, %B %d") }}.</p> 
-            <p>{{ hours }} hours and {{ minutes }} minutes from now</p>
-            {% endif %}
+        <div id="alarm-content">
+        {% block alarm %}
+        {% endblock %}
+        </div>
+
             <form action="javascript:void();">
                 <input class='alarm' type='time' name='alarm' {% if at %} value="{{ at.strftime('%H:%M') }}" {% else %} value="06:00" {% endif %}>
                 <div class="three columns alpha">
@@ -200,7 +196,6 @@
                     <button id='disable'>Disable</button>
                 </div>
             </form>
-
         </div>
 
 	</div><!-- container -->

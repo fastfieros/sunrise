@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, make_response
 import time, sys, Queue 
 #import RPi.GPIO as GPIO
 from sunrise import *
@@ -19,13 +19,18 @@ def getIndex():
     hours = 0
     minutes = 0
     if alarmtime is not None:
-        delt = alarmtime - datetime.datetime.now()
+        #delt = alarmtime - datetime.datetime.now()
         #seconds = delt.total_seconds()
         seconds = alarm.secondsLeft()
         hours = int(seconds / 3600)
         minutes = int( (seconds % 3600 ) / 60)
 
-    return render_template("index.html", at=alarmtime, hours=hours, minutes=minutes)
+    resp = make_response( render_template("alarm.html", request=request, 
+                           at=alarmtime, hours=hours, 
+                           minutes=minutes))
+
+    resp.cache_control.no_cache = True
+    return resp
 
 @app.route('/change/<name>/<newval>')
 def change(name, newval):
@@ -47,14 +52,20 @@ def setRGB(r,g,b):
 
 @app.route('/alarm')
 def getAlarm():
-    global alarmtime
-    global alarm
-    return str(alarmtime);
+    return getIndex()
 
 @app.route('/alarm/<timestr>')
 def setAlarm(timestr):
     global alarmtime
     global alarm
+
+    if timestr == "disable":
+        alarmtime = None
+        if alarm != None:
+            alarm.__del__()
+        alarm = None
+        return "Disabled"
+
     alarmtime = parser.parse(timestr, fuzzy=True)
 
     #if past day - then set it for tommorow!!
