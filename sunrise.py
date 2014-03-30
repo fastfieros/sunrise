@@ -48,17 +48,21 @@ class RGBstrip():
                 print "Invalid value: ",c
                 return;
 
-        self.ser.write("%d,%d,%d\n"%(self.g,self.r,self.b))
+        self.ser.write("%d,%d,%d\n"%(
+            256-self.g,
+            255-self.r,
+            255-self.b))
         print("%d,%d,%d\n"%(self.g,self.r,self.b))
 
     def current(self):
-        return "#%X%X%X"%(self.r,self.g,self.b)
+        return "#%02X%02X%02X"%(self.r,self.g,self.b)
 
     def alarm(self):
-        self.r = 128 
-        self.g = 128 
-        self.b = 128
+        self.r = 1
+        self.g = 0
+        self.b = 0
         self.setRgb()
+        print "ALARM!"
 
     def cleanup(self):
 
@@ -76,12 +80,15 @@ class timer(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        #print "running"
+        print "running"
         while not self.done:
             now = datetime.now()
-            #print "seconds left:", self.timeout - now
+            print self.secondsLeft(), "s left, sleeping 1"
+
             if now > self.timeout:
                 self.done = True
+
+                print "about to call: ", self.callback
                 if self.callback:
                     self.callback()
             else:
@@ -89,6 +96,9 @@ class timer(threading.Thread):
 
     def secondsLeft(self):
         return (self.timeout - datetime.now()).total_seconds()
+
+    def __del__(self):
+        self.done = True
 
 def callback():
     print "HAY."

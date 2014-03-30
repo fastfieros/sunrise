@@ -61,7 +61,12 @@ def setAlarm(timestr):
     if datetime.datetime.now() > alarmtime:
         alarmtime = alarmtime.replace(day=datetime.datetime.now().day+1)
         
+    if alarm != None:
+        alarm.__del__()
+
     alarm = timer(alarmtime, strip.alarm)
+    alarm.start()
+    print "alarm set for ", alarm.secondsLeft(), "seconds from now."
     return str(alarmtime)
 
 

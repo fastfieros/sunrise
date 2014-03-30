@@ -49,11 +49,17 @@
         });
         $("#disable").submit(function(event){
         });
+        $("#off-button").click(function(){
+                $.get("/setRGB/0/0/0",
+                        function(d){
+                            console.log(d);
+                        });
+        });
         $(".swatch").click(function(){
                 var r = $(this).attr("data-r");
                 var g = $(this).attr("data-g");
                 var b = $(this).attr("data-b");
-                $.get("/setRGB/"+r+"/"+g+"/"+g,
+                $.get("/setRGB/"+r+"/"+g+"/"+b,
                         function(d){
                             console.log(d);
                         });
@@ -164,10 +170,10 @@
                 <div class='clear'></div>
             </div>
             <div class="three columns alpha">
-                <button>On</button>
+                <button id="on-button">On</button>
             </div>
             <div class="three columns omega">
-                <button>Off</button>
+                <button id="off-button">Off</button>
             </div>
 		</div>
 
