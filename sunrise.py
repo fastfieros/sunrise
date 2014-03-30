@@ -3,12 +3,18 @@
 import time, os
 #import RPi.GPIO as GPIO
 import serial
+import threading
+from datetime import datetime, timedelta
 
 class RGBstrip():
 
 
     def __init__(self):
-        self.ser = serial.Serial("/dev/ttyAMA0")
+        try:
+            self.ser = serial.Serial("/dev/ttyAMA0")
+        except:
+            self.ser = file("/tmp/noserial", "w")
+
         self.r = 0;
         self.g = 0
         self.b = 0;
@@ -45,6 +51,15 @@ class RGBstrip():
         self.ser.write("%d,%d,%d\n"%(self.g,self.r,self.b))
         print("%d,%d,%d\n"%(self.g,self.r,self.b))
 
+    def current(self):
+        return "#%X%X%X"%(self.r,self.g,self.b)
+
+    def alarm(self):
+        self.r = 128 
+        self.g = 128 
+        self.b = 128
+        self.setRgb()
+
     def cleanup(self):
 
         self.ser.close()
@@ -52,6 +67,39 @@ class RGBstrip():
     def __del__(self):
         self.cleanup()
 
+class timer(threading.Thread):
+
+    def __init__(self, timeout=None, callback=None):
+        self.timeout = timeout or datetime.now()
+        self.done = False
+        self.callback = callback
+        threading.Thread.__init__(self)
+
+    def run(self):
+        #print "running"
+        while not self.done:
+            now = datetime.now()
+            #print "seconds left:", self.timeout - now
+            if now > self.timeout:
+                self.done = True
+                if self.callback:
+                    self.callback()
+            else:
+                time.sleep(1)
+
+    def secondsLeft(self):
+        return (self.timeout - datetime.now()).total_seconds()
+
+def callback():
+    print "HAY."
 
 if __name__ == "__main__":
-    pass
+
+    now = datetime.now() 
+    print "now: ", now
+    when = now + timedelta(seconds=5)
+    print "setting alarm for: ",when
+    t = timer(when, callback)
+    t.start()
+
+

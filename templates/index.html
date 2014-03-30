@@ -37,16 +37,28 @@
 
 	<script src="/static/jquery.js"></script>
     <script>
-    /*$(function(){
-        $("input.alarm").change({
-            "stop": function(){
-                    $.get("/change/"+$(this).attr('name')+"/"+$(this).val(), 
-                            function(d){
-                                console.log(d);
-                            });
-            }
+    var alarmtime="{{ at }}";
+    $(function(){
+        $("form").submit(function(event){
+                $.get("/alarm/"+$("input.alarm").val(),
+                        function(d){
+                            console.log(d);
+                        });
+
+                event.preventDefault();
         });
-    });*/
+        $("#disable").submit(function(event){
+        });
+        $(".swatch").click(function(){
+                var r = $(this).attr("data-r");
+                var g = $(this).attr("data-g");
+                var b = $(this).attr("data-b");
+                $.get("/setRGB/"+r+"/"+g+"/"+g,
+                        function(d){
+                            console.log(d);
+                        });
+        });
+    });
     </script>
 
     <style>
@@ -90,7 +102,7 @@
             box-shadow: none;
         }
 
-        button {
+        input[type='submit'], button {
             width: 100%;
             font-size: 28px;
             font-family: "Open Sans";
@@ -114,6 +126,9 @@
             clear: both;
             margin-bottom: 15px;
         }
+        img.clock.disabled {
+            opacity: 0.15;
+        }
     </style>
 
 </head>
@@ -128,23 +143,23 @@
             <h3>light</h3>
             <hr>
             <div class='swatches'>
-                <div class='swatch spacer'></div>
-                <div class='swatch swatch-red'></div>
-                <div class='swatch swatch-magenta'></div>
-                <div class='swatch swatch-blue'></div>
-                <div class='swatch spacer'></div>
+                <div                                     class='swatch spacer'></div>
+                <div data-r="FF" data-g="00" data-b="00" class='swatch swatch-red'></div>
+                <div data-r="FF" data-g="00" data-b="FF" class='swatch swatch-magenta'></div>
+                <div data-r="00" data-g="00" data-b="FF" class='swatch swatch-blue'></div>
+                <div                                     class='swatch spacer'></div>
 
-                <div class='swatch spacer'></div>
-                <div class='swatch swatch-orange'></div>
-                <div class='swatch swatch-white'></div>
-                <div class='swatch swatch-cyan'></div>
-                <div class='swatch spacer'></div>
+                <div                                     class='swatch spacer'></div>
+                <div data-r="FF" data-g="01" data-b="00" class='swatch swatch-orange'></div>
+                <div data-r="FF" data-g="FF" data-b="FF" class='swatch swatch-white'></div>
+                <div data-r="00" data-g="FF" data-b="FF" class='swatch swatch-cyan'></div>
+                <div                                     class='swatch spacer'></div>
 
-                <div class='swatch spacer'></div>
-                <div class='swatch swatch-pink'></div>
-                <div class='swatch swatch-yellow'></div>
-                <div class='swatch swatch-green'></div>
-                <div class='swatch spacer'></div>
+                <div                                     class='swatch spacer'></div>
+                <div data-r="FF" data-g="01" data-b="01" class='swatch swatch-pink'></div>
+                <div data-r="FF" data-g="FF" data-b="00" class='swatch swatch-yellow'></div>
+                <div data-r="00" data-g="FF" data-b="00" class='swatch swatch-green'></div>
+                <div                                     class='swatch spacer'></div>
 
                 <div class='clear'></div>
             </div>
@@ -161,16 +176,24 @@
             <h3>alarm</h3>
             <hr>
             <!--<img src="static/sunrise.png" class='clock'>-->
-            <img src="static/clock.png" class='clock'>
+            <img src="static/clock.png" class='clock disabled' id='clock' >
             <br>
-            <p>Is currently <strong id='alarmStatus'>disabled</strong>.</p>
-            <input class='alarm' type='time' name='alarm'>
-            <div class="three columns alpha">
-                <button>Set</button>
-            </div>
-            <div class="three columns omega">
-                <button>Disable</button>
-            </div>
+            <p>Is currently <strong id='alarmStatus'>
+            {% if not at %}
+            disabled </strong>.</p>
+            {% else %}
+            set </strong> for {{ at.strftime("%I:%M%p on %A, %B %d") }}.</p> 
+            <p>{{ hours }} hours and {{ minutes }} minutes from now</p>
+            {% endif %}
+            <form action="javascript:void();">
+                <input class='alarm' type='time' name='alarm' {% if at %} value="{{ at.strftime('%H:%M') }}" {% else %} value="06:00" {% endif %}>
+                <div class="three columns alpha">
+                    <input type='submit' value='Set'>
+                </div>
+                <div class="three columns omega">
+                    <button id='disable'>Disable</button>
+                </div>
+            </form>
 
         </div>
 
