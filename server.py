@@ -6,7 +6,7 @@ import time, sys, Queue
 from sunrise import *
 
 app=Flask(__name__)
-strip = RGBstrip()
+#strip = RGBstrip()
 
 @app.route('/')
 def getIndex():
@@ -18,10 +18,10 @@ def change(name, newval):
 
     x = 255 - int(newval) 
     print name, x
-    strip.update(name, x)
+    #strip.update(name, x)
 
     return "%s, %s"%(name,newval)
 
 if __name__ == "__main__":
 
-    app.run(host='0.0.0.0', port=80, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)

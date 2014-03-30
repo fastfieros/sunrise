@@ -1,18 +1,44 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
 <head>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
 
+	<!-- Basic Page Needs
+  ================================================== -->
+	<meta charset="utf-8">
 	<title>Sunrise</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
 
-	<link rel="stylesheet"  href="/static/jquery.mobile-1.4.2.min.css">
+	<!-- Mobile Specific Metas
+  ================================================== -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- CSS
+  ================================================== -->
+	<link rel="stylesheet" href="static/base.css">
+	<link rel="stylesheet" href="static/skeleton.css">
+	<link rel="stylesheet" href="static/layout.css">
+
+	<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+	<!-- Favicons
+	================================================== -->
+	<link rel="shortcut icon" href="images/favicon.ico">
+	<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
 
 	<script src="/static/jquery.js"></script>
-	<script src="/static/jquery.mobile-1.4.2.min.js"></script>
     <script>
-    $(function(){
-        $("input[type='number']").slider({
+    /*$(function(){
+        $("input.alarm").change({
             "stop": function(){
                     $.get("/change/"+$(this).attr('name')+"/"+$(this).val(), 
                             function(d){
@@ -20,27 +46,138 @@
                             });
             }
         });
-    });
+    });*/
     </script>
+
+    <style>
+        body {
+            /*background-color: #EEE;*/
+        }
+        .swatches {
+            width: 100%;
+            margin: 0 auto;
+            /*border: solid 1px rgba(0,0,0,0.15);*/
+            /*box-shadow: 3px 3px 15px rgba(0,0,0,0.15) ;*/
+            padding: 5px 0;
+            /*background-color: #EEE;*/
+        }
+        .swatch {
+            float: left;
+            width: 30%;
+            height: 75px;
+            border-top-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            margin: 1%;
+            box-shadow: 3px 3px 15px rgba(0,0,0,0.5) inset;
+        }
+        .swatch:active {
+            box-shadow: 1px 1px 5px rgba(0,0,0,0.5) ;
+        }
+        .swatch-red    {background-color: #F00;}
+        .swatch-green  {background-color: #0F0;}
+        .swatch-blue   {background-color: #00F;}
+        .swatch-cyan   {background-color: #0FF;}
+        .swatch-yellow {background-color: #FF0;}
+        .swatch-magenta{background-color: #F0F;}
+        .swatch-white  {background-color: #FFF;}
+        .swatch-orange {background-color: #F80;}
+        .swatch-pink   {background-color: #F88;}
+        .clear         {clear: both;}
+
+        .swatch.spacer {
+            width: 0px;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        button {
+            width: 100%;
+            font-size: 28px;
+            font-family: "Open Sans";
+            font-weight: 300;
+        }
+
+        input.alarm {
+            width: 100%;
+            font-family: "Open Sans";
+            font-weight: 300;
+            font-size: 24px;
+            border: solid 1px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+        .container {
+            margin-top: 5%;
+        }
+        img.clock {
+            width: 50%;
+            float: right;
+            clear: both;
+            margin-bottom: 15px;
+        }
+    </style>
+
 </head>
 <body>
-    
-    <div data-role="page">
 
-        <div data-role="header">Sunrise</div>
 
-        <div class="ui-content">
-            <label for="red">Red:</label>
-            <input type='number' name="red" id="red" min="0" max="255" value="128">
-            <label for="green">Green:</label>
-            <input type='number' name="green" id="green" min="0" max="255" value="128">
-            <label for="blue">Blue:</label>
-            <input type='number' name="blue" id="blue" min="0" max="255" value="128">
+	<div class="container">
+
+        <div class="sixteen columns" class='space-top'></div>
+
+		<div class="six columns offset-by-two">
+            <h3>light</h3>
+            <hr>
+            <div class='swatches'>
+                <div class='swatch spacer'></div>
+                <div class='swatch swatch-red'></div>
+                <div class='swatch swatch-magenta'></div>
+                <div class='swatch swatch-blue'></div>
+                <div class='swatch spacer'></div>
+
+                <div class='swatch spacer'></div>
+                <div class='swatch swatch-orange'></div>
+                <div class='swatch swatch-white'></div>
+                <div class='swatch swatch-cyan'></div>
+                <div class='swatch spacer'></div>
+
+                <div class='swatch spacer'></div>
+                <div class='swatch swatch-pink'></div>
+                <div class='swatch swatch-yellow'></div>
+                <div class='swatch swatch-green'></div>
+                <div class='swatch spacer'></div>
+
+                <div class='clear'></div>
+            </div>
+            <div class="three columns alpha">
+                <button>On</button>
+            </div>
+            <div class="three columns omega">
+                <button>Off</button>
+            </div>
+		</div>
+
+        <div class="six columns clearfix">
+
+            <h3>alarm</h3>
+            <hr>
+            <!--<img src="static/sunrise.png" class='clock'>-->
+            <img src="static/clock.png" class='clock'>
+            <br>
+            <p>Is currently <strong id='alarmStatus'>disabled</strong>.</p>
+            <input class='alarm' type='time' name='alarm'>
+            <div class="three columns alpha">
+                <button>Set</button>
+            </div>
+            <div class="three columns omega">
+                <button>Disable</button>
+            </div>
+
         </div>
 
-        <div data-role="footer">foot</div>
+	</div><!-- container -->
 
-    </div>
 
+<!-- End Document
+================================================== -->
 </body>
 </html>
