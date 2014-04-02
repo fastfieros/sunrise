@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import time, os
+import time, os, random
 #import RPi.GPIO as GPIO
 import serial
 import threading
@@ -16,7 +16,7 @@ class timer(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        print "running"
+        #print "running"
         while not self.done:
             now = datetime.now()
             #print self.secondsLeft(), "s left, sleeping 1"
@@ -40,6 +40,8 @@ class timer(threading.Thread):
 
 class RGBstrip():
 
+    secondsPerMinute = 60
+    minutesOfFade = 25
 
     def __init__(self):
         try:
@@ -51,7 +53,10 @@ class RGBstrip():
         self.g = 0
         self.b = 0;
 
+        self.dimFactor = 1.
+
         self.timer = None
+        self.cycleTimer = None
 
     def update(self, name, value):
 
@@ -73,7 +78,7 @@ class RGBstrip():
             print "Unknown name: ",name
             return
 
-        print "Set ",name," to ",value, ": ",self.r,self.g,self.b
+        #print "Set ",name," to ",value, ": ",self.r,self.g,self.b
         self.setRgb()
 
     def setRgb(self):
@@ -83,18 +88,17 @@ class RGBstrip():
                 return;
 
         self.ser.write("%d,%d,%d\n"%(
-            256-self.g,
-            255-self.r,
-            255-self.b))
-        print("%d,%d,%d\n"%(self.g,self.r,self.b))
+            256-int(self.dimFactor * self.g),
+            255-int(self.dimFactor * self.r),
+            255-int(self.dimFactor * self.b)
+            ))
+        #print("%d,%d,%d\n"%(self.g,self.r,self.b))
 
     def current(self):
         return "#%02X%02X%02X"%(self.r,self.g,self.b)
 
     def alarm(self):
-        secondsPerMinute = 60
-        minutesOfFade = 25
-        self.fade(255, 128, 0, secondsPerMinute * minutesOfFade)
+        self.fade(255, 128, 0, self.secondsPerMinute * self.minutesOfFade)
 
     def fade(self, new_r, new_g, new_b, seconds):
         if self.timer != None:
@@ -109,7 +113,11 @@ class RGBstrip():
         self.delta_b = new_b - self.b
 
         self.currentStep = 0
-        self.numSteps = max(
+
+        if seconds < 1:
+            self.numSteps = 15
+        else:
+           self.numSteps = max(
                 abs(self.delta_r), 
                 abs(self.delta_g), 
                 abs(self.delta_b))
@@ -138,11 +146,28 @@ class RGBstrip():
             self.timer = timer(
                     timeout = datetime.now() + timedelta(seconds=self.secondsPerStep), 
                     callback = self._stepFade, 
-                    res = self.secondsPerStep).start()
+                    res = 0.25*self.secondsPerStep).start()
         
+    def cycle(self):
+        self.stopCycle()
+
+        r = max(min(self.r + random.randint(-255,255), 255), 0)
+        g = max(min(self.g + random.randint(-255,255), 255), 0)
+        b = max(min(self.b + random.randint(-255,255), 255), 0)
+        print "Cycling to %02X%02X%02X"%(r,g,b)
+        self.fade(r,g,b, 10)
+
+        self.cycleTimer = timer(
+                        timeout = datetime.now() + timedelta(seconds=10), 
+                        callback = self.cycle,
+                        res = 3).start()
+
+    def stopCycle(self):
+        if self.cycleTimer:
+            self.cycleTimer.kill()
 
     def cleanup(self):
-
+        self.stopCycle()
         self.ser.close()
 
     def __del__(self):
@@ -162,4 +187,4 @@ if __name__ == "__main__":
     #t.start()
 
     s = RGBstrip()
-    s.fade(255,255,128,60)
+    s.fade(255,255,128,10)

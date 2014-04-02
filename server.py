@@ -19,8 +19,6 @@ def getIndex():
     hours = 0
     minutes = 0
     if alarmtime is not None:
-        #delt = alarmtime - datetime.datetime.now()
-        #seconds = delt.total_seconds()
         seconds = alarm.secondsLeft()
         hours = int(seconds / 3600)
         minutes = int( (seconds % 3600 ) / 60)
@@ -32,23 +30,39 @@ def getIndex():
     resp.cache_control.no_cache = True
     return resp
 
-@app.route('/change/<name>/<newval>')
-def change(name, newval):
-
-    x = 255 - int(newval) 
-    print name, x
-    strip.update(name, x)
-
-    return "%s, %s"%(name,newval)
+#@app.route('/change/<name>/<newval>')
+#def change(name, newval):
+#
+#    x = 255 - int(newval) 
+#    print name, x
+#    strip.update(name, x)
+#
+#    return "%s, %s"%(name,newval)
 
 @app.route('/setRGB/<r>/<g>/<b>')
 def setRGB(r,g,b):
-    strip.r = int(r, 16)
-    strip.g = int(g, 16)
-    strip.b = int(b, 16)
-    strip.setRgb()
+    strip.stopCycle()
+    strip.fade(int(r,16),
+               int(g,16),
+               int(b,16),
+               0.5)
 
     return strip.current() 
+
+@app.route('/dimmer/<newdim>')
+def setDimmer(newdim):
+    newval = float(newdim)
+    if newval >= 0 and newval <= 1:
+        strip.dimFactor = newval
+        strip.setRgb()
+        return "Set dimmer to %f."%newval
+    else:
+        return "dimfactor must be between 0 and 1"
+
+@app.route('/cycle')
+def startCycle():
+    strip.cycle()
+    return "started cycle"
 
 @app.route('/alarm')
 def getAlarm():
@@ -67,10 +81,11 @@ def setAlarm(timestr):
         return "Disabled"
 
     alarmtime = parser.parse(timestr, fuzzy=True)
+    alarmtime = alarmtime - datetime.timedelta(minutes=strip.minutesOfFade)
 
     #if past day - then set it for tommorow!!
     if datetime.datetime.now() > alarmtime:
-        alarmtime = alarmtime.replace(day=datetime.datetime.now().day+1)
+        alarmtime = alarmtime + datetime.timedelta(days=1)
         
     if alarm != None:
         alarm.__del__()
@@ -89,4 +104,4 @@ if __name__ == "__main__":
     alarmtime = None
     alarm = None
 
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)

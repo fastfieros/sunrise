@@ -58,15 +58,33 @@
 
         });
         $(".swatch").click(function(){
-                var r = $(this).attr("data-r");
-                var g = $(this).attr("data-g");
-                var b = $(this).attr("data-b");
-                $.get("/setRGB/"+r+"/"+g+"/"+b,
+                if ($(this).hasClass("swatch-cycle"))
+                {
+                    $.get("/cycle",
                         function(d){
-                            console.log(d);
+                             console.log(d);
                         });
+                }
+                else
+                {
+                    var r = $(this).attr("data-r");
+                    var g = $(this).attr("data-g");
+                    var b = $(this).attr("data-b");
+                    $.get("/setRGB/"+r+"/"+g+"/"+b,
+                        function(d){
+                             console.log(d);
+                        });
+                }
         });
     });
+    function changeDim() 
+    {
+        var dimval = $("#dimmer").val() * 0.01;
+            $.get("/dimmer/"+dimval,
+                        function(d){
+                             console.log(d);
+                        });
+    }
     </script>
 
     <style>
@@ -103,6 +121,7 @@
         .swatch-orange {background-color: #F80;}
         .swatch-pink   {background-color: #F88;}
         .swatch-black  {background-color: #282828;}
+        .swatch-cycle  {background: url("static/rainbow.png");}
         .clear         {clear: both;}
 
         .swatch.spacer {
@@ -126,6 +145,15 @@
             border: solid 1px rgba(0,0,0,0.15);
             text-align: center;
         }
+
+        input[type='range'] {
+            width: 100%;
+        }
+        input[type='range']::-webkit-slider-thumb {
+            width: 64px;
+            height: 64px;
+        }
+
         .container {
             margin-top: 5%;
         }
@@ -159,15 +187,15 @@
                 <div                                     class='swatch spacer'></div>
 
                 <div                                     class='swatch spacer'></div>
-                <div data-r="FF" data-g="88" data-b="00" class='swatch swatch-orange'></div>
-                <div data-r="FF" data-g="FF" data-b="FF" class='swatch swatch-white'></div>
+                <div data-r="FF" data-g="22" data-b="00" class='swatch swatch-orange'></div>
+                <div data-r="00" data-g="FF" data-b="00" class='swatch swatch-green'></div>
                 <div data-r="00" data-g="FF" data-b="FF" class='swatch swatch-cyan'></div>
                 <div                                     class='swatch spacer'></div>
 
                 <div                                     class='swatch spacer'></div>
                 <div data-r="00" data-g="00" data-b="00" class='swatch swatch-black'></div>
-                <div data-r="FF" data-g="FF" data-b="00" class='swatch swatch-yellow'></div>
-                <div data-r="00" data-g="FF" data-b="00" class='swatch swatch-green'></div>
+                <div data-r="FF" data-g="FF" data-b="FF" class='swatch swatch-white'></div>
+                <div                                     class='swatch swatch-cycle'></div>
                 <div                                     class='swatch spacer'></div>
 
                 <div class='clear'></div>
@@ -178,6 +206,7 @@
             <div class="three columns omega">
                 <button id="off-button">Off</button>
             </div>-->
+            <input type="range" name="dim" min="0" max="100" id="dimmer" onchange="changeDim();" >
 		</div>
 
         <div class="six columns clearfix">
