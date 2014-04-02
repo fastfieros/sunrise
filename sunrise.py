@@ -59,12 +59,13 @@ class RGBstrip():
                 print "Invalid value: ",c
                 return;
 
-        self.ser.write("%d,%d,%d\n"%(
+        cmd = ("%d,%d,%d\n"%(
             256-int(round(self.dimFactor * self.g)),
             255-int(round(self.dimFactor * self.r)),
             255-int(round(self.dimFactor * self.b))
             ))
-        #print("%d,%d,%d\n"%(self.g,self.r,self.b))
+        self.ser.write(cmd)
+        print(cmd)
 
     def current(self):
         return "#%02X%02X%02X"%(self.r,self.g,self.b)
