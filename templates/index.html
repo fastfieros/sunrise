@@ -40,30 +40,32 @@
     var alarmtime="{{ at }}";
     $(function(){
         $("form").submit(function(event){
-                $.get("/alarm/"+$("input.alarm").val(),
-                        function(d){
-                            console.log(d);
-                            $("#alarm-content").load('/alarm');
-                        });
+            $.get("/alarm/"+$("input.alarm").val(),
+            function(d){
+                console.log(d);
+                $("#alarm-content").load('/alarm');
+            });
 
-                event.preventDefault();
+            event.preventDefault();
         });
+
         $("#disable").click(function(event){
-                $.get("/alarm/disable",
-                        function(d){
-                            console.log(d);
-                            $("#alarm-content").load('/alarm');
-                        });
-                event.preventDefault();
-
+            $.get("/alarm/disable",
+            function(d){
+                console.log(d);
+                $("#alarm-content").load('/alarm');
+            });
+            
+            event.preventDefault();
         });
+
         $(".swatch").click(function(){
                 if ($(this).hasClass("swatch-cycle"))
                 {
                     $.get("/cycle",
-                        function(d){
-                             console.log(d);
-                        });
+                    function(d){
+                        console.log(d);
+                    });
                 }
                 else
                 {
@@ -71,20 +73,29 @@
                     var g = $(this).attr("data-g");
                     var b = $(this).attr("data-b");
                     $.get("/setRGB/"+r+"/"+g+"/"+b,
-                        function(d){
-                             console.log(d);
-                        });
+                    function(d){
+                        console.log(d);
+                    });
                 }
         });
     });
+
     function changeDim() 
     {
         var dimval = $("#dimmer").val() * 0.01;
-            $.get("/dimmer/"+dimval,
-                        function(d){
-                             console.log(d);
-                        });
+        $.get("/dimmer/"+dimval,
+        function(d){
+            console.log(d);
+        });
     }
+
+    setInterval(function(){
+        $.get("/dimmer",
+        function(d){
+            $("#dimmer").val(d);
+        });
+    }, 5000);
+
     </script>
 
     <style>
@@ -146,6 +157,10 @@
             text-align: center;
         }
 
+        .rangeWrap
+            width: 100%;
+            padding: 15px;
+        }
         input[type='range'] {
             width: 100%;
         }
@@ -200,13 +215,14 @@
 
                 <div class='clear'></div>
             </div>
-            <!--<div class="three columns alpha">
-                <button id="on-button">On</button>
-            </div>
-            <div class="three columns omega">
-                <button id="off-button">Off</button>
-            </div>-->
-            <input type="range" name="dim" min="0" max="100" id="dimmer" onchange="changeDim();" >
+
+            <div class='rangeWrap'>
+                <input type="range" name="dim" id="dimmer" 
+                   value="{{ dimmer }}"
+                   min="0" max="100" 
+                   onchange="changeDim();" >
+           </div><!-- rangeWrap -->
+
 		</div>
 
         <div class="six columns clearfix">

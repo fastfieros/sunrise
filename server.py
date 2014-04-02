@@ -23,9 +23,9 @@ def getIndex():
         hours = int(seconds / 3600)
         minutes = int( (seconds % 3600 ) / 60)
 
-    resp = make_response( render_template("alarm.html", request=request, 
-                           at=alarmtime, hours=hours, 
-                           minutes=minutes))
+    resp = make_response( render_template("alarm.html", 
+        request=request, at=alarmtime, dimmer=int(round(strip.dimFactor * 100)),
+        hours=hours, minutes=minutes))
 
     resp.cache_control.no_cache = True
     return resp
@@ -47,6 +47,10 @@ def setRGB(r,g,b):
                0.5)
 
     return strip.current() 
+
+@app.route('/dimmer')
+def getDimmer(newdim):
+    return str(round(strip.dimFactor * 100))
 
 @app.route('/dimmer/<newdim>')
 def setDimmer(newdim):
@@ -80,11 +84,12 @@ def setAlarm(timestr):
         return "Disabled"
 
     alarmtime = parser.parse(timestr, fuzzy=True)
-    #alarmtime = alarmtime - datetime.timedelta(minutes=strip.minutesOfFade)
 
     #if past day - then set it for tommorow!!
     if datetime.datetime.now() > alarmtime:
         alarmtime = alarmtime + datetime.timedelta(days=1)
+
+    #alarmtime = alarmtime - datetime.timedelta(minutes=strip.minutesOfFade)
         
     if alarm != None:
         alarm.__del__()
@@ -103,4 +108,4 @@ if __name__ == "__main__":
     alarmtime = None
     alarm = None
 
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)
