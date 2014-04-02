@@ -1,0 +1,15 @@
+{% if not request.is_xhr %}{%extends "index.html" %}{% endif -%}
+{% block alarm %}
+            <h3>alarm</h3>
+            <hr>
+            <!--<img src="static/sunrise.png" class='clock'>-->
+            <img src="static/clock.png" class='clock disabled' id='clock' >
+            <br>
+            <p>Is currently <strong id='alarmStatus'>
+            {% if not at %}
+            disabled </strong>.</p>
+            {% else %}
+            set </strong> for {{ at.strftime("%I:%M%p on %A, %B %d") }}.</p> 
+            <p>{{ hours }} hours and {{ minutes }} minutes from now</p>
+            {% endif %}
+{% endblock %}
