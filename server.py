@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 from flask import Flask, render_template, url_for, request, make_response
-import time, sys, Queue 
 #import RPi.GPIO as GPIO
 from sunrise import *
 from dateutil import parser
 import datetime
+from timer import timer
 
 app=Flask(__name__)
 strip = RGBstrip()
@@ -35,13 +35,12 @@ def getIndex():
 #
 #    x = 255 - int(newval) 
 #    print name, x
-#    strip.update(name, x)
+#    strip.changeCompnent(name, x)
 #
 #    return "%s, %s"%(name,newval)
 
 @app.route('/setRGB/<r>/<g>/<b>')
 def setRGB(r,g,b):
-    strip.stopCycle()
     strip.fade(int(r,16),
                int(g,16),
                int(b,16),
@@ -54,7 +53,7 @@ def setDimmer(newdim):
     newval = float(newdim)
     if newval >= 0 and newval <= 1:
         strip.dimFactor = newval
-        strip.setRgb()
+        strip.apply()
         return "Set dimmer to %f."%newval
     else:
         return "dimfactor must be between 0 and 1"
@@ -81,7 +80,7 @@ def setAlarm(timestr):
         return "Disabled"
 
     alarmtime = parser.parse(timestr, fuzzy=True)
-    alarmtime = alarmtime - datetime.timedelta(minutes=strip.minutesOfFade)
+    #alarmtime = alarmtime - datetime.timedelta(minutes=strip.minutesOfFade)
 
     #if past day - then set it for tommorow!!
     if datetime.datetime.now() > alarmtime:
@@ -90,7 +89,7 @@ def setAlarm(timestr):
     if alarm != None:
         alarm.__del__()
 
-    alarm = timer(alarmtime, strip.alarm)
+    alarm = timer(alarmtime, strip.sunrise)
     alarm.start()
     print "alarm set for ", alarm.secondsLeft(), "seconds from now."
     return str(alarmtime)
@@ -104,4 +103,4 @@ if __name__ == "__main__":
     alarmtime = None
     alarm = None
 
-    app.run(host='0.0.0.0', port=80, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)
