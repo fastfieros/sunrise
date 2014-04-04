@@ -49,7 +49,7 @@ def setRGB(r,g,b):
     return strip.current() 
 
 @app.route('/dimmer')
-def getDimmer(newdim):
+def getDimmer():
     return str(round(strip.dimFactor * 100))
 
 @app.route('/dimmer/<newdim>')

@@ -65,7 +65,7 @@ class RGBstrip():
             255-int(round(self.dimFactor * self.b))
             ))
         self.ser.write(cmd)
-        print(cmd)
+        #print(cmd)
 
     def current(self):
         return "#%02X%02X%02X"%(self.r,self.g,self.b)
@@ -141,7 +141,7 @@ class RGBstrip():
         prog = min(secondsSoFar / self.fadeSeconds, 1)
 
         self.currentStep = int(round(prog * self.numSteps))
-        print ("%3.2f%%, step %d/%d"%(prog, self.currentStep, self.numSteps))
+        #print ("%3.2f%%, step %d/%d"%(prog, self.currentStep, self.numSteps))
 
         #set colors to correct output
         self.r = self.last_r + int(prog * self.delta_r)
@@ -168,7 +168,6 @@ class RGBstrip():
             # call the callback if there is one, then reset it so
             # it doens't get called again if it's not set in the future
             self.fadeCallback and self.fadeCallback()
-            self.fadeCallback = None
 
         
     def cycle(self):
@@ -181,7 +180,7 @@ class RGBstrip():
         print "Cycling to %02X%02X%02X"%(r,g,b)
 
         #Fade to the new color slowly, callback is ourself!
-        self.fade(r,g,b, 10, self.cycle)
+        self.fade(r,g,b, 16, self.cycle)
 
 
     def cleanup(self):
