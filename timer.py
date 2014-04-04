@@ -3,6 +3,7 @@
 import threading
 import time
 from datetime import datetime, timedelta
+from dateutil import parser
 
 class timer(threading.Thread):
 
@@ -50,6 +51,71 @@ class timer(threading.Thread):
         """Dtor. calls kill"""
         self.kill()
 
+class Alarm():
+
+    def __init__(self, timestr, usercallback, days=(True, True, True, True, True, False, False)):
+
+        alarmDate = parser.parse(timestr, fuzzy=True)
+        print ("parsed timstr to: ", alarmDate)
+
+        self.alarmtime = alarmDate.time()
+        self.nextAlarmDate = alarmDate
+        self.daysActive = days;
+        self.usercallback = usercallback
+        self.timerForNextAlarm = None
+
+        allfalse = True
+        for i in days:
+            if days[i]:
+                allfalse = False
+
+        if allfalse:
+            #There are no set days!
+            print "No days set.."
+            return None;
+
+        self.setNextTimer()
+
+    def setNextTimer(self):
+
+        #start with todays date, at the scheduled alarmtime 
+        now = datetime.now() 
+        self.nextAlarmDate = now.replace(
+                hour=self.alarmtime.hour, 
+                minute=self.alarmtime.minute,
+                second=self.alarmtime.second)
+
+        # if that is in the past, change it to tomorrow
+        if now > self.nextAlarmDate:
+            self.nextAlarmDate += timedelta(days=1)
+
+        #increment day until we find one where the user wants an alarm
+        while self.daysActive[now.weekday()] == False:
+            self.nextAlarmDate += timedelta(days=1)
+
+        #kill any previously running alarm timer (shouldn't need this?)
+        self.cleanup()
+
+        print "setting next alarm for ", self.nextAlarmDate
+        self.timerForNextAlarm = timer(self.nextAlarmDate, self.callback, res=30)
+        self.timerForNextAlarm.start()
+
+    def secondsLeft(self):
+        if self.timerForNextAlarm != None:
+            return self.timerForNextAlarm.secondsLeft()
+        else:
+            return None
+
+    def cleanup(self):
+        if self.timerForNextAlarm != None:
+            self.timerForNextAlarm.kill()
+
+    def callback(self):
+
+        self.setNextTimer()
+        self.usercallback()
+
+
 def callback():
     print "HAY."
 
@@ -59,5 +125,8 @@ if __name__ == "__main__":
     print "now: ", now
     when = now + timedelta(seconds=5)
     print "setting alarm for: ",when
-    t = timer(when, callback)
-    t.start()
+    #t = timer(when, callback)
+    #t.start()
+
+    a = Alarm(str(when), callback)
+    print "wait.. "

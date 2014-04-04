@@ -1,43 +1,32 @@
 #!/usr/bin/env python
 
-from flask import Flask, render_template, url_for, request, make_response
-#import RPi.GPIO as GPIO
+from flask import Flask, render_template, request, make_response
 from sunrise import *
-from dateutil import parser
-import datetime
-from timer import timer
+from timer import timer, Alarm
 
-app=Flask(__name__)
+app = Flask(__name__)
 strip = RGBstrip()
 
 @app.route('/')
 def getIndex():
-    global alarmtime
     global alarm
 
     at = None
     hours = 0
     minutes = 0
-    if alarmtime is not None:
+    if alarm is not None:
+        at = alarm.alarmtime
         seconds = alarm.secondsLeft()
-        hours = int(seconds / 3600)
-        minutes = int( (seconds % 3600 ) / 60)
+        if seconds is not None:
+            hours = int(seconds / 3600)
+            minutes = int( (seconds % 3600 ) / 60)
 
     resp = make_response( render_template("alarm.html", 
-        request=request, at=alarmtime, dimmer=int(round(strip.dimFactor * 100)),
+        request=request, at=at, dimmer=int(round(strip.dimFactor * 100)),
         hours=hours, minutes=minutes))
 
     resp.cache_control.no_cache = True
     return resp
-
-#@app.route('/change/<name>/<newval>')
-#def change(name, newval):
-#
-#    x = 255 - int(newval) 
-#    print name, x
-#    strip.changeCompnent(name, x)
-#
-#    return "%s, %s"%(name,newval)
 
 @app.route('/setRGB/<r>/<g>/<b>')
 def setRGB(r,g,b):
@@ -73,39 +62,21 @@ def getAlarm():
 
 @app.route('/alarm/<timestr>')
 def setAlarm(timestr):
-    global alarmtime
     global alarm
 
     if timestr == "disable":
-        alarmtime = None
-        if alarm != None:
-            alarm.__del__()
+        alarm.cleanup()
         alarm = None
         return "Disabled"
 
-    alarmtime = parser.parse(timestr, fuzzy=True)
-
-    #if past day - then set it for tommorow!!
-    if datetime.datetime.now() > alarmtime:
-        alarmtime = alarmtime + datetime.timedelta(days=1)
-
-    #alarmtime = alarmtime - datetime.timedelta(minutes=strip.minutesOfFade)
-        
-    if alarm != None:
-        alarm.__del__()
-
-    alarm = timer(alarmtime, strip.sunrise)
-    alarm.start()
+    alarm = Alarm(timestr, strip.sunrise)
     print "alarm set for ", alarm.secondsLeft(), "seconds from now."
-    return str(alarmtime)
+    return str(alarm.nextAlarmDate)
 
 
 if __name__ == "__main__":
 
-    global alarmtime
     global alarm
-
-    alarmtime = None
     alarm = None
 
     app.run(host='0.0.0.0', port=80, debug=True)
