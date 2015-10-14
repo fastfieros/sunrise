@@ -63,7 +63,7 @@ def getAlarm():
 
 @app.route('/alarm/weekend/<override>')
 def setWeekendOverride():
-    weekendOverride = override
+    weekendOverride = override == "on"
     if weekendOverride:
         return "Weekend Override set"
     else:
