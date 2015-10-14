@@ -165,6 +165,7 @@ class RGBstrip():
             # don't want rounding or CPU delays to make us stop at 96.7%..
             self._stepFade(final=True)
 
+        else:
             # call the callback if there is one, then reset it so
             # it doens't get called again if it's not set in the future
             self.fadeCallback and self.fadeCallback()
@@ -180,7 +181,8 @@ class RGBstrip():
         print "Cycling to %02X%02X%02X"%(r,g,b)
 
         #Fade to the new color slowly, callback is ourself!
-        self.fade(r,g,b, 16, self.cycle)
+        #self.fade(r,g,b, 16, self.cycle)
+        self.fade(r,g,b, 3, self.cycle)
 
 
     def cleanup(self):
