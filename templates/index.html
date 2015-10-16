@@ -59,6 +59,20 @@
             event.preventDefault();
         });
 
+        $("#weekend").click(function(event){
+            var ison = $(this).is(':checked');
+            var on = "off";
+            if (ison) { on = "on"; }
+
+            $.get("/alarm/weekend/" + on,
+            function(d){
+                console.log(d);
+                $("#alarm-content").load('/alarm');
+            });
+            
+            event.preventDefault();
+        });
+
         $(".swatch").click(function(){
                 if ($(this).hasClass("swatch-cycle"))
                 {
@@ -238,6 +252,8 @@
                 </div>
                 <div class="three columns omega">
                     <button id='disable'>Disable</button>
+                    <input type='checkbox' id='weekend'></input>
+                    <label for="weekend"></label>
                 </div>
             </form>
         </div>
