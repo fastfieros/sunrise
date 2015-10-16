@@ -87,11 +87,11 @@ class Alarm():
 
         # if that is in the past, change it to tomorrow
         if now > self.nextAlarmDate:
-            self.nextAlarmDate += timedelta(days=1)
+            self.nextAlarmDate = self.nextAlarmDate + timedelta(days=1)
 
         #increment day until we find one where the user wants an alarm
-        while self.daysActive[now.weekday()] == False:
-            self.nextAlarmDate += timedelta(days=1)
+        while self.daysActive[self.nextAlarmDate.weekday()] == False:
+            self.nextAlarmDate = self.nextAlarmDate + timedelta(days=1)
 
         #kill any previously running alarm timer (shouldn't need this?)
         self.cleanup()
@@ -101,7 +101,7 @@ class Alarm():
         self.timerForNextAlarm.start()
 
     def secondsLeft(self):
-        if self.timerForNextAlarm != None:
+        if self.timerForNextAlarm:
             return self.timerForNextAlarm.secondsLeft()
         else:
             return None

@@ -15,7 +15,7 @@ def getIndex():
     hours = 0
     minutes = 0
     if alarm is not None:
-        at = alarm.alarmtime
+        at = alarm.nextAlarmDate
         seconds = alarm.secondsLeft()
         if seconds is not None:
             hours = int(seconds / 3600)
@@ -65,9 +65,12 @@ def setAlarm(timestr):
     global alarm
 
     if timestr == "disable":
-        alarm.cleanup()
-        alarm = None
-        return "Disabled"
+        if alarm:
+            alarm.cleanup()
+            alarm = None
+            return "Disabled"
+        else:
+            return "No Alarm"
 
     alarm = Alarm(timestr, strip.sunrise)
     print "alarm set for ", alarm.secondsLeft(), "seconds from now."

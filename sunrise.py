@@ -174,9 +174,9 @@ class RGBstrip():
 
         #select new color by adding random delta to each
         # exisiting component
-        r = max(min(self.r + random.randint(-255,255), 255), 0)
-        g = max(min(self.g + random.randint(-255,255), 255), 0)
-        b = max(min(self.b + random.randint(-255,255), 255), 0)
+        r = max(min(self.r + random.randint(-1024,1024), 255), 0)
+        g = max(min(self.g + random.randint(-1024,1024), 255), 0)
+        b = max(min(self.b + random.randint(-1024,1024), 255), 0)
         print "Cycling to %02X%02X%02X"%(r,g,b)
 
         #Fade to the new color slowly, callback is ourself!
