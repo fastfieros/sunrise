@@ -2,6 +2,7 @@
 
 import time, os, random
 #import RPi.GPIO as GPIO
+from RPIO import PWM
 import serial
 import threading
 from datetime import datetime, timedelta
@@ -14,14 +15,15 @@ class RGBstrip():
     minutesOfFade = 20
 
     def __init__(self):
-        try:
-            self.ser = serial.Serial("/dev/ttyAMA0")
-        except:
-            self.ser = file("/tmp/noserial", "w")
+        PWM.cleanup()
+        PWM.setup(1)
+        PWM.init_channel(1, 5000)
+        PWM.init_channel(2, 5000)
+        PWM.init_channel(3, 5000)
 
-        self.r = 0;
+        self.r = 0
         self.g = 0
-        self.b = 0;
+        self.b = 0
 
         self.dimFactor = 1.
 
@@ -59,13 +61,19 @@ class RGBstrip():
                 print "Invalid value: ",c
                 return;
 
-        cmd = ("%d,%d,%d\n"%(
-            256-int(round(self.dimFactor * self.g)),
-            255-int(round(self.dimFactor * self.r)),
-            255-int(round(self.dimFactor * self.b))
-            ))
-        self.ser.write(cmd)
-        #print(cmd)
+        maxval = 5000.0 - 1
+        rval = int(round(self.dimFactor * ((self.r/255.0) * (maxval))))
+        gval = int(round(self.dimFactor * ((self.g/255.0) * (maxval))))
+        bval = int(round(self.dimFactor * ((self.b/255.0) * (maxval))))
+
+        PWM.clear_channel(1)
+        PWM.add_channel_pulse(1, 17, 0, bval)
+
+        PWM.clear_channel(2)
+        PWM.add_channel_pulse(2, 27, 0, rval)
+
+        PWM.clear_channel(3)
+        PWM.add_channel_pulse(3, 22, 0, gval)
 
     def current(self):
         return "#%02X%02X%02X"%(self.r,self.g,self.b)
@@ -186,7 +194,11 @@ class RGBstrip():
 
 
     def cleanup(self):
-        self.ser.close()
+        #self.ser.close()
+        PWM.clear_channel_gpio(1, 17)
+        PWM.clear_channel_gpio(2, 27)
+        PWM.clear_channel_gpio(3, 22)
+        PWM.cleanup()
 
     def __del__(self):
         self.cleanup()
