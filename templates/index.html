@@ -70,7 +70,6 @@
                 $("#alarm-content").load('/alarm');
             });
             
-            event.preventDefault();
         });
 
         $(".swatch").click(function(){
@@ -161,6 +160,9 @@
             font-family: "Open Sans";
             font-weight: 300;
         }
+        label {
+            display: inline;
+        }
 
         input.alarm {
             width: 100%;
@@ -181,6 +183,10 @@
         input[type='range']::-webkit-slider-thumb {
             width: 64px;
             height: 64px;
+        }
+        input[type='checkbox'] {
+            width: 24px;
+            height: 24px;
         }
 
         .container {
@@ -247,13 +253,15 @@
 
             <form action="javascript:void();">
                 <input class='alarm' type='time' name='alarm' {% if at %} value="{{ at.strftime('%H:%M') }}" {% else %} value="06:00" {% endif %}>
+                <div class="six columns" style="padding: 15px;">
+                    <input type='checkbox' id='weekend'></input>
+                    <label for="weekend">Include Weekends</label>
+                </div>
                 <div class="three columns alpha">
                     <input type='submit' value='Set'>
                 </div>
                 <div class="three columns omega">
                     <button id='disable'>Disable</button>
-                    <input type='checkbox' id='weekend'></input>
-                    <label for="weekend"></label>
                 </div>
             </form>
         </div>

@@ -6,7 +6,7 @@ from timer import timer, Alarm
 
 app = Flask(__name__)
 strip = RGBstrip()
-weekendOverride = False
+weekendOverride=False
 
 @app.route('/')
 def getIndex():
@@ -24,7 +24,7 @@ def getIndex():
 
     resp = make_response( render_template("alarm.html", 
         request=request, at=at, dimmer=int(round(strip.dimFactor * 100)),
-        hours=hours, minutes=minutes, wo=weekendOverride))
+        hours=hours, minutes=minutes))
 
     resp.cache_control.no_cache = True
     return resp
@@ -62,7 +62,8 @@ def getAlarm():
     return getIndex()
 
 @app.route('/alarm/weekend/<override>')
-def setWeekendOverride():
+def setWeekendOverride(override):
+    global weekendOverride
     weekendOverride = override == "on"
     if weekendOverride:
         return "Weekend Override set"
